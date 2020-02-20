@@ -1,22 +1,41 @@
 <template>
   <div class="home">
     <h1>{{message}}</h1>
-    <div>
+    <div class="new-form">
       <h2>Add Product:</h2>
       <input type="text" placeholder="product name" v-model="productName"> 
       <input type="text" placeholder="product price" v-model="productPrice">
       <input type="text" placeholder="product description" v-model="productDescription">
       <input type="text" placeholder="product image_url" v-model="productImageUrl">
       <button v-on:click="AddRecipe()"> Add Recipe! </button>
-    </div>
+    </div> 
     
     <div v-for="product in products">
-      <img v-on:click="currentProduct = product" v-bind:src="product.image_url">
+      <img v-on:click="showProducts(product)" v-bind:src="product.image_url">
       <p><strong>Product ID:</strong> {{product.id}}</p>
       <p> <strong>Product Name:</strong> {{ product.name }}</p>
       <p><strong>Product Price:</strong> {{ product.price }}</p>
-      <div v-if="product === currentProduct">
-        <p><strong>Product Description:</strong> {{ product.description }}</p>  
+      <div class="show-page" v-if="product === currentProduct">
+        <p><strong>Product Description:</strong> {{ product.description }}</p> 
+        <div class="edit-form">
+          <h4>Edit Product</h4>
+          <div>
+            Name: <input type="text" v-model="product.name">
+          </div>
+          <div>
+            Price: <input type="text" v-model="product.price">
+          </div>
+          <div>
+            Description: <input type="text" v-model="product.description">
+          </div>
+          <div>
+            Image_Url: <input type="text" v-model="product.image_url">
+          </div>
+          <button v-on:click="updateProduct(product)">Update</button>
+        </div> 
+        <div class="destroy-action">
+          <button v-on:click="destroyProduct(product)">Destroy Product!</button>
+        </div>
       </div>
     </div>
   </div>
@@ -63,18 +82,42 @@ export default { //the Vue object lives within the scope of the export default h
         console.log(response.data);
         //this.response1.push(response.data);
       });
-    }
-    // DeleteRecipe: function(){
+    },
 
-      //   let params = { id: this.product_id }
+    showProducts: function(input){
+      if (this.currentProduct !== input){
+        this.currentProduct = input;
+      } else {
+        this.currentProduct = {};
+      }
+    },
 
-      //   console.log(params)
-        
+    updateProduct: function(input){
+      let clientParams = {
+        name: input.name,
+        price: input.price,
+        description: input.description,
+        image_url: input.image_url
+      };
 
-      // axios.delete("/api/products/", params["id"]).then(response => {
-      //   console.log('Product has been destroyed!')
-      // });
-    // },
+      axios
+      .patch("api/products/" + input.id, clientParams)
+      .then(response => {
+        console.log("Success")
+      }).catch(error => {
+        console.log(error.response.date);
+      });
+    },
+
+    destroyProduct: function(input) {
+      axios
+      .delete("/api/products/" + input.id)
+      .then(response =>{
+        console.log("Product Destroyed!");
+        var index = this.products.indexOf(input);
+        this.products.splice(index, 1);
+      });
+    },
   }
 };
 </script>
