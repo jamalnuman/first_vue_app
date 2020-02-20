@@ -21,6 +21,11 @@
   padding: 30px;
 }
 
+img{
+  width: 250px;
+  height: 250px;
+}
+
 #nav a {
   font-weight: bold;
   color: #2c3e50;
